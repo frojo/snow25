@@ -1,0 +1,132 @@
+:root {
+  --yellow-text: #806418;
+  --purple-text: #98289e;
+  --blue-text: #00a99b;
+  --green-text: #12821f;
+  --text-color: var(--yellow-text);
+
+
+  --yellow-bg: #fff8e6;
+  --purple-bg: #fcebff;
+  --blue-bg: #efffff;
+  --green-bg: #eaffee;
+  --bg-color: var(--green-bg);
+}
+
+
+body {
+  margin: 0;
+
+  min-width: 320px;
+  min-height: 100vh;
+
+  /* padding-left: 90px;
+  padding-right: 90px;
+  padding-top: 80px;
+  padding-bottom: 80px; */
+
+  /* not too wide */
+  /* max-width: 700px; */
+
+  background-size: cover;
+  background-position: center center;
+
+  background-color: var(--bg-color);
+  /*
+  */
+
+  /* 
+  image-rendering: pixelated;
+  */
+}
+
+button,
+body {
+  font-family: "Times New Roman", serif;
+  font-size: 1em;
+}
+
+
+::selection {
+  background: rgba(0, 0, 0, .99);
+  color: white;
+}
+
+/* get rid of default html link styling*/
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+}
+
+a:visited {
+  color: var(--text-color);
+}
+
+a:hover{
+  color: white;
+  background-color: black;
+}
+
+
+img {
+  width: 100%;
+}
+
+
+
+#page {
+  /* nice big margins give you room to breathe*/
+  margin: 1em;
+
+  /* not too wide */
+  /* max-width: 900px; */
+}
+
+.game {
+}
+
+
+/* header nav bar*/
+
+#header {
+  margin-bottom: 3em;
+
+  /* i think it's nice when u can make the words jumble
+  min-width: 280px;
+  */
+}
+
+
+/* classes for the weird interactive theming */
+
+/* hover effects */
+
+.blacked-out {
+  left: 1000px;
+  color: black;
+  background-color: black;
+}
+
+.invisible {
+  opacity: 0;
+}
+
+.black-bg {
+  background-color: black;
+}
+
+/* mobile */
+/* @media only screen and (max-width: 480px) {
+
+  body {
+    padding: 36px;
+    font-size: 3em;
+  
+  
+  }
+
+
+} */
+
+
