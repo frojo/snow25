@@ -9,8 +9,9 @@
 .game-frame {
   display: flex;
   justify-content: center;
+  align-items: center;
 
 }
 .game {
-  width: 50%;
+  width: 90%;
 }

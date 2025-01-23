@@ -8,13 +8,7 @@ const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementsByClassName("game")[0],
 });
 
-// todo: is ther a better practice here?
-// we know page is non-null bc this module gets loaded after the DOM
-const page = document.getElementById("page")!
-
 //renderer.setPixelRatio(window.devicePixelRatio)
-
-//renderer.setSize( window.innerWidth, window.innerHeight );
 
 const ASPECT = 2 / 1;
 
@@ -40,7 +34,7 @@ function calcSizes(container: HTMLElement): Sizes {
 
 function resize() {
   // Update sizes
-  sizes = calcSizes(page);
+  sizes = calcSizes(renderer.domElement);
 
   // Update camera
   camera.aspect = sizes.width / sizes.height;
