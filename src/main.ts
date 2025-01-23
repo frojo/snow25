@@ -16,7 +16,7 @@ const page = document.getElementById("page")!
 
 //renderer.setSize( window.innerWidth, window.innerHeight );
 
-const ASPECT = 2 / 1
+const ASPECT = 2 / 1;
 
 interface Sizes {
   width: number;
@@ -31,6 +31,9 @@ let sizes : Sizes = {
 function calcSizes(container: HTMLElement): Sizes {
   const width = container.offsetWidth;
   const height = width / ASPECT;
+
+  // const width = window.innerWidth;
+  // const height = window.innerHeight;
 
   return { width, height };
 }

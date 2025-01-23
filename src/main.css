@@ -1,10 +1,16 @@
 #page {
   /* nice big margins give you room to breathe*/
-  margin: 1em;
+  margin: 3vh 1vw;
 
   /* not too wide */
   /* max-width: 900px; */
 }
 
+.game-frame {
+  display: flex;
+  justify-content: center;
+
+}
 .game {
+  width: 50%;
 }
