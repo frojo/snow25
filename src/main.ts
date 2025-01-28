@@ -2,6 +2,8 @@
 import "./fran.css";
 import "./main.css";
 
+import * as coro from '@ajeeb/coroutines';
+
 import * as THREE from "three";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import GUI from 'lil-gui'; 
@@ -50,13 +52,6 @@ function resize() {
 }
 window.addEventListener("resize", resize);
 
-function animate() {
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-
-  renderer.render(scene, camera);
-}
-renderer.setAnimationLoop(animate);
 
 // SET UP SCENE
 const scene = new THREE.Scene();
@@ -89,15 +84,15 @@ loader.load(
 	// resource URL
 	'assets/litwick.glb',
 	// called when the resource is loaded
-	function ( gltf ) {
+	function ( model ) {
 
-		scene.add( gltf.scene );
+		scene.add( model.scene );
 
-		gltf.animations; // Array<THREE.AnimationClip>
-		gltf.scene; // THREE.Group
-		gltf.scenes; // Array<THREE.Group>
-		gltf.cameras; // Array<THREE.Camera>
-		gltf.asset; // Object
+		model.animations; // Array<THREE.AnimationClip>
+		model.scene; // THREE.Group
+		model.scenes; // Array<THREE.Group>
+		model.cameras; // Array<THREE.Camera>
+		model.asset; // Object
 
 	},
 	// called while loading is progressing
@@ -119,10 +114,33 @@ const light = new THREE.AmbientLight( 0xffffff, 0.1 ); // soft white light
 scene.add( light );
 
 const point_light = new THREE.PointLight( 0xffffff, 0.8);
+point_light.position.setZ(1);
 scene.add( point_light );
 
-gui.add(point_light.position, 'x')
+gui.add(point_light.position, 'z')
 
-camera.position.z = 5;
+camera.position.z = 2;
 
 resize();
+
+
+const SCHED = new coro.Schedule()
+function tick() {
+    SCHED.tick()
+
+  for (const obj of scene.children) {
+    obj.rotation.x += 0.01;
+    obj.rotation.y += 0.01;
+  }
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(tick)
+}
+tick()
+
+// function animate() {
+
+
+//   renderer.render(scene, camera);
+// }
+// renderer.setAnimationLoop(animate);
