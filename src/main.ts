@@ -8,6 +8,7 @@ import * as THREE from "three";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 import GUI from 'lil-gui';
 import { MathUtils, Vector3 } from "three";
@@ -112,27 +113,30 @@ const toonMaterial = new THREE.MeshToonMaterial({ color: 0x00ffff, gradientMap: 
 const box_geometry = new THREE.BoxGeometry(1, 1, 1);
 const cube = new THREE.Mesh(box_geometry, toonMaterial)
 cube.translateX(-3)
-scene.add(cube)
+// scene.add(cube)
 
 const sphere_geo = new THREE.SphereGeometry(1)
 const sphere = new THREE.Mesh(sphere_geo, toonMaterial);
 sphere.translateX(3)
-scene.add(sphere);
+// scene.add(sphere);
 
 const loader = new GLTFLoader()
 
-let litwick: THREE.Group | null = null;
+// copying pattern from:
+// https://git.sr.ht/~nasser/lospec-2/tree/main/item/main.js
+
+let litwickMesh: THREE.Object3D | null = null;
+
 // Load a glTF resource
 loader.load(
   // resource URL
   'assets/litwick.glb',
   // called when the resource is loaded
   function (model) {
-
-    litwick = model.scene;
+    litwickMesh = SkeletonUtils.clone(model.scene)
 
     // toonify the material
-    litwick.traverse(function (o) {
+    litwickMesh.traverse(function (o) {
       if (o instanceof THREE.Mesh) {
         const toonifiedMat = new THREE.MeshToonMaterial(
           {
@@ -144,27 +148,48 @@ loader.load(
       }
     })
 
+  },
+  // called while loading is progressing
+  function (xhr) {
+    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+  },
+  // called when loading has errors
+  function (error) {
+    console.log(`Error loading model: ${error}`);
+  }
+);
 
-    scene.add(litwick);
+let envMesh : THREE.Object3D | null = null
 
-    model.animations; // Array<THREE.AnimationClip>
-    model.scene; // THREE.Group
-    model.scenes; // Array<THREE.Group>
-    model.cameras; // Array<THREE.Camera>
-    model.asset; // Object
+// Load a glTF resource
+new GLTFLoader().load(
+  // resource URL
+  'assets/environment.glb',
+  // called when the resource is loaded
+  function (model) {
+    envMesh = model.scene.clone()
+
+    // toonify the material
+    envMesh.traverse(function (o) {
+      if (o instanceof THREE.Mesh) {
+        const toonifiedMat = new THREE.MeshToonMaterial(
+          {
+            map: o.material.map,
+            gradientMap: fiveTone
+          });
+
+        o.material = toonifiedMat;
+      }
+    })
 
   },
   // called while loading is progressing
   function (xhr) {
-
     console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-
   },
   // called when loading has errors
   function (error) {
-
     console.log(`Error loading model: ${error}`);
-
   }
 );
 
@@ -173,12 +198,6 @@ loader.load(
 
 const ambient_light = new THREE.AmbientLight('white', 0.1); // soft white light
 scene.add(ambient_light);
-
-// const point_light = new THREE.PointLight( 0xffffff, 2, 800);
-// point_light.position.setZ(1);
-// scene.add( point_light );
-
-// gui.add(point_light.position, 'z')
 
 const dirLight = new THREE.DirectionalLight('white', 2);
 const dLphi = MathUtils.degToRad(-70);
@@ -198,8 +217,6 @@ const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
 scene.add(dirLightHelper);
 
 
-
-
 camera.position.z = 2;
 
 resize();
@@ -217,6 +234,7 @@ function* slowRotate(obj: THREE.Object3D | null) {
     console.log("litwick")
     yield
   }
+  scene.add(obj)
 
   while (true) {
     obj.rotation.x += 0.01
@@ -225,12 +243,36 @@ function* slowRotate(obj: THREE.Object3D | null) {
   }
 }
 
+function* litwickRotate() {
+  while (!litwickMesh)  {
+    yield
+  }
+  
+  const mesh = SkeletonUtils.clone(litwickMesh);
+  scene.add(mesh)
+
+  while (true) {
+    mesh.rotation.x += 0.01
+    mesh.rotation.y += 0.01
+    yield
+  }
+}
+
+SCHED.add(function*() {
+  while (!envMesh) yield
+
+  envMesh.position.setY(-3)
+
+  scene.add(envMesh.clone())
+})
+
 SCHED.add(slowRotate(cube));
 SCHED.add(slowRotate(sphere));
-SCHED.add(slowRotate(litwick));
+SCHED.add(litwickRotate());
 
 function tick() {
   SCHED.tick()
+
 
   render();
 
